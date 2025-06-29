@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
+import { ImageKitProvider } from "@imagekit/next";
+import { ThemeProvider } from "next-themes";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,7 +29,11 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {children}
+        <ThemeProvider attribute={"class"}>
+          <ImageKitProvider urlEndpoint="https://ik.imagekit.io/qmuhu58mj">
+            {children}
+          </ImageKitProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
