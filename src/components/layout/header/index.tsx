@@ -11,6 +11,7 @@ import { Image } from "@imagekit/next";
 import { Button } from "@/components/ui/button";
 import { LogInIcon, LogOutIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
+import { Bookmarks } from "./bookmarks";
 
 export const Header = () => {
   return (
@@ -44,7 +45,7 @@ const HeaderAuth = async () => {
       {user ? (
         <Popover>
           <PopoverTrigger>
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-2 cursor-pointer">
               <Image
                 src={user.image!}
                 alt={user?.name || "User Avatar"}
@@ -60,7 +61,7 @@ const HeaderAuth = async () => {
 
             <Separator />
 
-            {/* <Bookmarks /> */}
+            <Bookmarks />
 
             <form action={logout}>
               <button
