@@ -1,6 +1,6 @@
 import React from "react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { GenerateImage } from "./component";
+import { AddCarForm, GenerateImage } from "./component";
 
 const Page = () => {
   return (
@@ -18,7 +18,7 @@ const Page = () => {
           </TabsList>
 
           <TabsContent value="add-car" className="w-[50rem]">
-            {/* <AddCarForm /> */}
+            <AddCarForm />
           </TabsContent>
 
           <TabsContent value="generate-image" className="w-[50rem]">

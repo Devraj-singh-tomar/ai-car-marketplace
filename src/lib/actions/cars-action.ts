@@ -1,5 +1,12 @@
 "use server";
 
+import { auth } from "@/auth";
+import { prisma } from "../prisma";
+import { AddCarSchema } from "../zod";
+import { revalidatePath, unstable_cache as cache } from "next/cache";
+import { _toUpperCase } from "zod/v4/core";
+import { CarType, carTypes } from "@/constants/cars";
+
 export const generateImage = async (text: string, name: string) => {
   try {
     const encodedText = encodeURIComponent(text);
@@ -40,3 +47,159 @@ export const generateImage = async (text: string, name: string) => {
     throw new Error("failed to generate image");
   }
 };
+
+export const addNewCar = async (carData: AddCarSchema) => {
+  const session = await auth();
+
+  const authUser = session?.user;
+  if (!authUser) throw new Error("User not authorized");
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email: authUser.email!,
+    },
+  });
+
+  if (!user) throw new Error("User not found");
+
+  // ========== Car create, Car seller, Car specification ==========
+
+  await prisma.$transaction(async (tx) => {
+    const {
+      name,
+      brand,
+      type,
+      year,
+      mileage,
+      colors,
+      price,
+      description,
+      images,
+      features,
+      location,
+      fuelType,
+    } = carData;
+
+    const car = await tx.car.create({
+      data: {
+        name,
+        brand,
+        type,
+        year,
+        mileage,
+        colors,
+        price,
+        description,
+        images,
+        features,
+        location,
+        fuelType,
+        userId: user.id,
+      },
+    });
+
+    const {
+      sellerAddress,
+      sellerCity,
+      sellerCountry,
+      sellerEmail,
+      sellerName,
+      sellerPhone,
+      sellerState,
+      sellerWebsite,
+      sellerZip,
+      sellerImage,
+    } = carData;
+
+    await tx.carSeller.create({
+      data: {
+        address: sellerAddress,
+        city: sellerCity,
+        country: sellerCountry,
+        email: sellerEmail,
+        name: sellerName,
+        phone: sellerPhone,
+        state: sellerState,
+        website: sellerWebsite,
+        postalCode: sellerZip,
+        image: sellerImage,
+        carId: car.id,
+      },
+    });
+
+    const {
+      engineCapacity,
+      doors,
+      seats,
+      topSpeed,
+      acceleration,
+      horsepower,
+      torque,
+      length,
+      width,
+      height,
+      weight,
+    } = carData;
+
+    await tx.carSpecification.create({
+      data: {
+        engineCapacity,
+        doors,
+        seats,
+        topSpeed,
+        acceleration,
+        horsepower,
+        torque,
+        length,
+        width,
+        height,
+        weight,
+        carId: car.id,
+      },
+    });
+
+    return car;
+  });
+
+  console.log("Car added successfully");
+
+  revalidatePath("/");
+};
+
+export const getCars = cache(
+  async ({ page = 1, type = "all" }: { page?: number; type?: string }) => {
+    const limit = 8;
+    const offset = (page - 1) * limit;
+
+    const allowedTypes = type
+      .split(",")
+      .filter(Boolean)
+      .map((t) => t.toUpperCase()) as [];
+
+    const isValidType = allowedTypes.some(
+      (t) => carTypes.includes(t as CarType) || t === "all"
+    );
+
+    const cars = await prisma.car.findMany({
+      skip: offset,
+      take: limit,
+      where: {
+        ...(type !== "all" &&
+          isValidType && {
+            type: {
+              in: allowedTypes,
+            },
+          }),
+      },
+      orderBy: {
+        createdAt: "desc",
+      },
+    });
+
+    return cars;
+  },
+  [],
+  {
+    revalidate: 60 * 60 * 24,
+  }
+);

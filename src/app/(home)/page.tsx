@@ -13,6 +13,7 @@ import { CarIcon, Plus, Search } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
 import { Filters } from "./filters";
+import { getCars } from "@/lib/actions/cars-action";
 
 type Props = {
   searchParams: { type: string; page: string };
@@ -122,8 +123,7 @@ const FeaturedCars = async ({ searchParams }: Props) => {
   const page = Number(searchParams.page) || 1;
   const type = searchParams.type || "all";
 
-  // const cars = await getCars({ page, type });
-  const cars = sampleCars;
+  const cars = await getCars({ page, type });
 
   return cars.map((car) => (
     <Card key={car.id} className="overflow-hidden">
