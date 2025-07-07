@@ -23,6 +23,7 @@ import {
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
 import { CarType, carTypes, CarFuelType } from "@/constants/cars";
+import { autoGenerateCar } from "@/lib/actions/ai-action";
 import { addNewCar, generateImage } from "@/lib/actions/cars-action";
 import { imageKitAuthenticator } from "@/lib/imageKit";
 import {
@@ -364,6 +365,7 @@ export const AddCarForm = () => {
     setColors([]);
     setFeatures([]);
     reset();
+    localStorage.removeItem(STORAGE_KEY);
   }, [reset, clearImages]);
 
   const onSubmit = useCallback(
@@ -396,10 +398,67 @@ export const AddCarForm = () => {
     [resetState, setSubmitHandlerLoading]
   );
 
-  const autoGenerateHandler = useCallback(() => {}, []);
+  const autoGenerateHandler = useCallback(async () => {
+    try {
+      if (!watch("name"))
+        return toast.error("Please enter a car name to generate images");
+
+      setIsGenerateAILoading(true);
+
+      // GENERATE INFO
+
+      const result = await autoGenerateCar(watch("name"));
+      console.log("result", result);
+
+      if (!result) {
+        toast.error("Failed to generate car details");
+        return;
+      }
+
+      setColors(result.colors);
+      setFeatures(result.features);
+
+      // SET GENERATED DATA TO FORM STATE
+
+      Object.entries(result).forEach(([key, value]) => {
+        if (key === "images") return;
+
+        if (key === "sellerImage") {
+          setValue("sellerImage", "/default-image.jpg");
+          return;
+        }
+
+        setValue(key as keyof AddCarSchema, value as string);
+      });
+
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(result));
+
+      toast.success("Car details generated successfully");
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message);
+      } else {
+        toast.error("Failed to generate car details");
+      }
+    } finally {
+      setIsGenerateAILoading(false);
+    }
+  }, [watch, setValue]);
 
   useEffect(() => {
     setValue("images", images);
+
+    const savedCarDetails = localStorage.getItem(STORAGE_KEY);
+
+    if (!savedCarDetails) return;
+    const parsedDetails = JSON.parse(savedCarDetails);
+
+    setColors(parsedDetails.colors);
+    setFeatures(parsedDetails.features);
+
+    Object.entries(parsedDetails).forEach(([key, value]) => {
+      setValue(key as keyof AddCarSchema, value as string);
+    });
   }, [images, setValue]);
 
   return (
