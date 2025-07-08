@@ -56,3 +56,14 @@ export const addCarSchema = z.object({
 });
 
 export type AddCarSchema = z.infer<typeof addCarSchema>;
+
+export const contactSellerSchema = z.object({
+  carId: z.string().nonempty("Car ID is required"),
+  content: z.string().nonempty("Message content is required"),
+  firstName: z.string().nonempty("First name is required"),
+  lastName: z.string().nonempty("Last name is required"),
+  email: z.string().email("Invalid email format").nonempty("Email is required"),
+  phone: z.string().nonempty("Phone number is required"),
+});
+
+export type ContactSellerSchema = z.infer<typeof contactSellerSchema>;

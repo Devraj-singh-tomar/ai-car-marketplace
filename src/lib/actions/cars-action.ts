@@ -2,12 +2,10 @@
 
 import { auth } from "@/auth";
 import { prisma } from "../prisma";
-import { AddCarSchema } from "../zod";
+import { AddCarSchema, contactSellerSchema, ContactSellerSchema } from "../zod";
 import { revalidatePath, unstable_cache as cache } from "next/cache";
 import { _toUpperCase } from "zod/v4/core";
 import { CarType, carTypes } from "@/constants/cars";
-import { string } from "zod";
-import { log } from "console";
 
 export const generateImage = async (text: string, name: string) => {
   try {
@@ -391,4 +389,49 @@ export const bookmarkCar = async (carId: string) => {
   }
 
   revalidatePath(`/cars/${carId}`);
+};
+
+export const contactSeller = async (data: ContactSellerSchema) => {
+  contactSellerSchema.parse(data);
+
+  const { carId, content, email, firstName, lastName, phone } = data;
+
+  const session = await auth();
+  const authUser = session?.user;
+
+  if (!authUser) throw new Error("User not authenticated");
+
+  const user = await prisma.user.findUnique({
+    where: {
+      email: authUser.email!,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!user) throw new Error("User not found");
+  if (!carId) throw new Error("Car ID is required");
+
+  const car = await prisma.car.findUnique({
+    where: {
+      id: carId,
+    },
+    select: {
+      id: true,
+    },
+  });
+
+  if (!car) throw new Error("Car not found");
+
+  await prisma.message.create({
+    data: {
+      firstName,
+      lastName,
+      content,
+      email,
+      phone,
+      userId: user.id,
+    },
+  });
 };
