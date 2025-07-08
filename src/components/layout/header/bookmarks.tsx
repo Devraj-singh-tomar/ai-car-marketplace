@@ -9,10 +9,12 @@ import {
   SheetTrigger,
 } from "@/components/ui/sheet";
 import { Skeleton } from "@/components/ui/skeleton";
+import { getBookmarkCars } from "@/lib/actions/users-action";
 import { Image } from "@imagekit/next";
 import { BookmarkIcon } from "lucide-react";
 import Link from "next/link";
 import { Suspense } from "react";
+import { RemoveBookmark } from "./remove-bookmark";
 
 export const Bookmarks = async () => {
   return (
@@ -42,8 +44,12 @@ export const Bookmarks = async () => {
   );
 };
 
-const MainContent = () => {
-  const cars = sampleCars;
+const MainContent = async () => {
+  const cars = await getBookmarkCars();
+
+  if (!cars) return <p className="text-center">No cars found</p>;
+
+  if (cars.length === 0) return <p className="text-center">No cars saved</p>;
 
   return cars.map((car) => (
     <Card key={car.id} className="overflow-hidden">
@@ -55,7 +61,7 @@ const MainContent = () => {
           className="object-cover"
         />
 
-        {/* <RemoveBookmark carId={car.id} /> */}
+        <RemoveBookmark carId={car.id} />
       </div>
 
       <CardContent className="p-4">
@@ -87,27 +93,27 @@ const MainContent = () => {
   ));
 };
 
-const sampleCars = [
-  {
-    id: "1",
-    name: "BMW X4",
-    brand: "BMW",
-    type: "SEDAN",
-    year: "2012",
-    mileage: 30000,
-    colors: ["red", "green"],
-    price: 30000.0,
-    description: "A luxury SUV with a sporty design and advanced features.",
-    images: ["/carcover.jpg"],
-    userId: "asd123",
-    isSold: false,
-    isFeatured: false,
-    isNew: false,
-    features: ["Towing package", "Navigation system"],
-    location: "London, UK",
-    fuelType: "PETROL",
-    transmission: "AUTOMATIC",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-];
+// const sampleCars = [
+//   {
+//     id: "1",
+//     name: "BMW X4",
+//     brand: "BMW",
+//     type: "SEDAN",
+//     year: "2012",
+//     mileage: 30000,
+//     colors: ["red", "green"],
+//     price: 30000.0,
+//     description: "A luxury SUV with a sporty design and advanced features.",
+//     images: ["/carcover.jpg"],
+//     userId: "asd123",
+//     isSold: false,
+//     isFeatured: false,
+//     isNew: false,
+//     features: ["Towing package", "Navigation system"],
+//     location: "London, UK",
+//     fuelType: "PETROL",
+//     transmission: "AUTOMATIC",
+//     createdAt: new Date(),
+//     updatedAt: new Date(),
+//   },
+// ];
