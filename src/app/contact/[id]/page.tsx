@@ -9,9 +9,9 @@ import { Suspense } from "react";
 import { ContactSellerForm } from "./form";
 
 type Props = {
-  params: {
+  params: Promise<{
     id: string;
-  };
+  }>;
 };
 
 export default function ContactSeller({ params }: Props) {
@@ -27,7 +27,9 @@ export default function ContactSeller({ params }: Props) {
 }
 
 const MainContent = async ({ params }: Props) => {
-  const car = await getCarById(params.id);
+  const { id } = await params;
+
+  const car = await getCarById(id);
 
   if (!car) {
     return <div className="text-center">Car not found</div>;
@@ -80,7 +82,7 @@ const MainContent = async ({ params }: Props) => {
 
           <CardContent className="space-y-6">
             <Suspense fallback={<Skeleton className=" h-16 w-16" />}>
-              <SellerInfo id={params.id} />
+              <SellerInfo id={id} />
             </Suspense>
           </CardContent>
         </Card>

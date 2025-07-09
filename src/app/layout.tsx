@@ -19,6 +19,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "Car Marketplace",
   description: "Find your dream car",
+  icons: "/car.png",
 };
 
 export default function RootLayout({
