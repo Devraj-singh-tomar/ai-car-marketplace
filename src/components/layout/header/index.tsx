@@ -17,7 +17,7 @@ export const Header = () => {
   return (
     <header className="p-5 w-full flex justify-between  items-center">
       <Link href="/" className="">
-        CAR's
+        CAR
       </Link>
 
       <div className="flex gap-2">

@@ -87,7 +87,7 @@ export const GenerateImage = () => {
       setImage(data);
 
       toast.success("Image generated successfully", { id: toastId });
-    } catch (error) {
+    } catch {
       toast.error("Error generating image", { id: toastId });
     } finally {
       setGeneratingLoader(false);

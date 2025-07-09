@@ -181,29 +181,29 @@ const features = [
   },
 ];
 
-const sampleCars = [
-  {
-    id: "1",
-    name: "BMW X4",
-    brand: "BMW",
-    type: "SEDAN",
-    year: "2012",
-    mileage: 30000,
-    colors: ["red", "green"],
-    price: 30000.0,
-    description: "A luxury SUV with a sporty design and advanced features.",
-    images: ["/carcover.jpg"],
-    userId: "asd123",
-    isSold: false,
-    isFeatured: false,
-    isNew: false,
-    features: ["Towing package", "Navigation system"],
-    location: "London, UK",
-    fuelType: "PETROL",
-    transmission: "AUTOMATIC",
-    createdAt: new Date(),
-    updatedAt: new Date(),
-  },
-];
+// const sampleCars = [
+//   {
+//     id: "1",
+//     name: "BMW X4",
+//     brand: "BMW",
+//     type: "SEDAN",
+//     year: "2012",
+//     mileage: 30000,
+//     colors: ["red", "green"],
+//     price: 30000.0,
+//     description: "A luxury SUV with a sporty design and advanced features.",
+//     images: ["/carcover.jpg"],
+//     userId: "asd123",
+//     isSold: false,
+//     isFeatured: false,
+//     isNew: false,
+//     features: ["Towing package", "Navigation system"],
+//     location: "London, UK",
+//     fuelType: "PETROL",
+//     transmission: "AUTOMATIC",
+//     createdAt: new Date(),
+//     updatedAt: new Date(),
+//   },
+// ];
 
 export default Home;

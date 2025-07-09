@@ -4,7 +4,6 @@ import { auth } from "@/auth";
 import { prisma } from "../prisma";
 import { AddCarSchema, contactSellerSchema, ContactSellerSchema } from "../zod";
 import { revalidatePath, unstable_cache as cache } from "next/cache";
-import { _toUpperCase } from "zod/v4/core";
 import { CarType, carTypes } from "@/constants/cars";
 
 export const generateImage = async (text: string, name: string) => {

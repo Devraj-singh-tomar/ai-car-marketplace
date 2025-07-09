@@ -17,7 +17,7 @@ export const getMyProfile = cache(
 
       if (!user) return null;
       return user;
-    } catch (error) {
+    } catch {
       return null;
     }
   },
