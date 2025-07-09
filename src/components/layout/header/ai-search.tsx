@@ -10,16 +10,44 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Textarea } from "@/components/ui/textarea";
+import { findCar } from "@/lib/actions/ai-action";
 import { SearchIcon } from "lucide-react";
+import { useRouter } from "next/navigation";
 import React, { FormEvent, useState } from "react";
+import { toast } from "sonner";
+import { string } from "zod";
 
 export const AISearch = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
   const [description, setDescription] = useState("");
 
-  const submitHandler = (e: FormEvent<HTMLFormElement>) => {
+  const router = useRouter();
+
+  const submitHandler = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+
+    if (!description) return toast.error("Please enter some description first");
+
+    setIsLoading(true);
+
+    try {
+      const result: "No car found" | "Error generating car search" | string =
+        await findCar(description);
+
+      const carId = string().parse(result);
+      router.replace(`/cars/${carId}`);
+
+      toast.success(`Car found with ID: ${carId}`);
+
+      setDescription("");
+      setIsOpen(false);
+    } catch (error) {
+      if (error instanceof Error) toast.error(error.message);
+      else toast.error("An unexpected error occurred.");
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
