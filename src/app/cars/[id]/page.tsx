@@ -36,16 +36,21 @@ export async function generateStaticParams() {
   }));
 }
 
-type Props = { params: Promise<{ id?: string }> };
+// type Props = { params: Promise<{ id?: string }> };
 
-export default async function CarPage({ params }: Props) {
+type Params = { id?: string };
+type Props = { params: Params };
+
+export default async function CarPage({ params }: { params: Promise<Params> }) {
+  const resolvedParams = await params;
+
   return (
     <div className="container mx-auto py-10">
       <main className="min-h-screen bg-white dark:bg-zinc-900 pb-16">
         {/* Image Gallery */}
         <div className="relative h-[60vh] bg-black">
           <Suspense fallback={<Skeleton className="h-full w-full" />}>
-            <Cover params={params} />
+            <Cover params={resolvedParams} />
           </Suspense>
         </div>
 
@@ -60,12 +65,12 @@ export default async function CarPage({ params }: Props) {
                 </div>
               }
             >
-              <MainContent params={params} />
+              <MainContent params={resolvedParams} />
             </Suspense>
 
             {/* Sidebar */}
             <Suspense fallback={<Skeleton className="h-96 w-full" />}>
-              <Sidebar params={params} />
+              <Sidebar params={resolvedParams} />
             </Suspense>
           </div>
         </div>
@@ -75,11 +80,9 @@ export default async function CarPage({ params }: Props) {
 }
 
 const Cover = async ({ params }: Props) => {
-  const param = await params;
+  if (!params.id) return notFound();
 
-  if (!param.id) return notFound();
-
-  const car = await getCarById(param.id);
+  const car = await getCarById(params.id);
 
   if (!car) return notFound();
 
@@ -95,7 +98,7 @@ const Cover = async ({ params }: Props) => {
         className="object-cover"
       />
 
-      <CoverButtons carId={param.id} userId={user?.id} savedBy={car.savedBy} />
+      <CoverButtons carId={params.id} userId={user?.id} savedBy={car.savedBy} />
     </>
   ) : (
     <div className="h-full bg-gray-200"></div>
@@ -103,11 +106,9 @@ const Cover = async ({ params }: Props) => {
 };
 
 const MainContent = async ({ params }: Props) => {
-  const param = await params;
+  if (!params.id) return notFound();
 
-  if (!param.id) return notFound();
-
-  const car = await getCarById(param.id);
+  const car = await getCarById(params.id);
 
   if (!car) return notFound();
 
@@ -296,11 +297,9 @@ const MainContent = async ({ params }: Props) => {
 };
 
 const Sidebar = async ({ params }: Props) => {
-  const param = await params;
+  if (!params.id) return notFound();
 
-  if (!param.id) return notFound();
-
-  const seller = await getSellerInfo(param.id);
+  const seller = await getSellerInfo(params.id);
 
   if (!seller) return notFound();
 
@@ -327,9 +326,9 @@ const Sidebar = async ({ params }: Props) => {
             </div>
           </div>
           <Link href={`/contact/${seller.carId}`}>
-            <Button className="w-full mb-3">Contact Seller</Button>{" "}
+            <Button className="w-full mb-3">Contact Seller</Button>
           </Link>
-          <TestDriveForm carId={param.id} />
+          <TestDriveForm carId={params.id} />
         </CardContent>
       </Card>
     </div>
